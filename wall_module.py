@@ -2,13 +2,13 @@ import pygame
 from pygame.locals import *
 
 # colors 
-block_one = (192, 192, 192)
-block_two = (105, 105, 105)
-block_three = (47, 79, 79)
-bg = (240, 231, 219)
+block_one = (255,255,0)
+block_two = (50,205,50)
+block_three = (178,34,34)
+bg = (0,0,0)
 
 # display of the screen
-screen = pygame.display.set_mode((600, 600))
+screen = pygame.display.set_mode((600, 1000))
 
 rows = 6
 cols = 6
@@ -56,7 +56,7 @@ class Wall():
                 else:
                     block_color = block_one
                 pygame.draw.rect(screen, block_color, block[0])
-                pygame.draw.rect(screen, bg, (block[0]), 1)
+                pygame.draw.rect(screen, bg, (block[0]), 2)
 
 def init_wall():
     global wall

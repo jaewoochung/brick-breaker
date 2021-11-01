@@ -3,6 +3,13 @@ from pygame.locals import *
 import wall_module
 import paddle_module
 
+pygame.mixer.init()
+
+brick_sounds = pygame.mixer.Sound('sounds/sounds_brick.wav')
+paddle_sounds = pygame.mixer.Sound('sounds/sounds_paddle.wav')
+wall_sounds = pygame.mixer.Sound('sounds/sounds_wall.wav')
+game_over_sound = pygame.mixer.Sound('sounds/arcade_sound_lost.mp3')
+
 screen_width = 600
 screen_height = 600
 
@@ -34,6 +41,7 @@ class Ball():
             for item in row:
                 # check collision for each one
                 if self.rect.colliderect(item[0]):
+                    brick_sounds.play()
                     # check if collision is from above
                     if abs(self.rect.bottom - item[0].top) < collision_threshold and self.speed_y > 0:
                         self.speed_y *= -1
@@ -63,18 +71,33 @@ class Ball():
                         
         # check for collision with wall
         if self.rect.left < 0 or self.rect.right > screen_width:
+            wall_sounds.play()
             self.speed_x *= -1
 
         # check for collision with top and bot of screen
         if self.rect.top < 0:
+            wall_sounds.play()
             self.speed_y *= -1
         if self.rect.bottom > screen_height:
+            game_over_sound.play()
             self.game_over = -1
 
         # collision with paddle
         if self.rect.colliderect(paddle_module.paddle):
+            paddle_sounds.play()
             # collision from the top
             if abs(self.rect.bottom - paddle_module.paddle.rect.top) < collision_threshold and self.speed_y > 0:
+                # ball is coming left to right towards the paddle
+                if self.speed_x > 0:
+                    # collision with left half of paddle mirror the direction on impact
+                    if self.rect.midbottom >= paddle_module.paddle.rect.topleft and self.rect.midbottom <= paddle_module.paddle.rect.midtop:
+                        self.speed_x *= -1
+                # ball is coming right to left towards the paddle
+                if self.speed_x < 0:
+                    if self.rect.midbottom <= paddle_module.paddle.rect.topright and \
+                       self.rect.midbottom >= paddle_module.paddle.rect.midtop:
+                        self.speed_x *= -1
+                
                 self.speed_y *= -1
                 self.speed_x += paddle_module.paddle.direction
                 if self.speed_x > self.speed_max:
